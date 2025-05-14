@@ -89,6 +89,12 @@ const AddWordForm: React.FC<AddWordFormProps> = ({ userId, onWordAdded }) => {
       }
 
       const data = await response.json();
+
+      // API yanıtını kontrol et ve işle
+      if (!data.choices || data.choices.length === 0 || !data.choices[0].message || !data.choices[0].message.content) {
+        throw new Error('API yanıtı beklenmedik formatta veya eksik bilgi: choices, message veya content bulunamadı.');
+      }
+
       const content = data.choices[0].message.content.trim();
 
       // API yanıtını ayrıştırma
@@ -102,7 +108,7 @@ const AddWordForm: React.FC<AddWordFormProps> = ({ userId, onWordAdded }) => {
       }
 
       if (!translatedWord || !explanation) {
-        throw new Error('API yanıtı beklenmedik formatta veya eksik bilgi.');
+        throw new Error('API yanıtı beklenmedik formatta veya eksik bilgi: Çeviri veya Açıklama bulunamadı.');
       }
 
       setTranslatedWordResult(translatedWord); // Çeviri sonucunu state'e kaydet
