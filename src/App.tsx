@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'; // useState ve useMemo import et
+import { useState, useMemo } from 'react'; // useState ve useMemo import et
 import { Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import Login from './pages/Login';
