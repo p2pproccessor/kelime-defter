@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // useEffect import edildi
 import { supabase } from '../supabaseClient';
 import { TextField, Button, Box, Typography, Alert, FormControl, InputLabel, Select, MenuItem } from '@mui/material'; // Material UI bileşenlerini import et
+import type { Session } from '@supabase/supabase-js'; // Session tipi import edildi
 
 interface AddWordFormProps {
   userId: string;
@@ -14,6 +15,48 @@ const AddWordForm: React.FC<AddWordFormProps> = ({ userId, onWordAdded }) => {
   const [selectedModel, setSelectedModel] = useState('google/gemma-3-27b-it:free'); // Varsayılan model
   const [translatedWordResult, setTranslatedWordResult] = useState<string | null>(null); // Çeviri sonucunu saklamak için state
   const [explanationResult, setExplanationResult] = useState<string | null>(null); // Açıklama sonucunu saklamak için state
+  const [userApiKey, setUserApiKey] = useState<string | null>(null); // Kullanıcının API anahtarını saklamak için state
+  const [session, setSession] = useState<Session | null>(null); // Oturum bilgisini saklamak için state
+
+  // Oturum bilgisini çekme
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Kullanıcının API anahtarını çekme
+  useEffect(() => {
+    if (session) {
+      const fetchUserApiKey = async () => {
+        const { data, error } = await supabase
+          .from('user_api_keys')
+          .select('api_key')
+          .eq('user_id', session.user.id)
+          .single();
+
+        if (error && error.code !== 'PGRST116') { // PGRST116: Satır bulunamadı hatası
+          console.error('Kullanıcı API anahtarı çekilirken hata oluştu:', error);
+          setUserApiKey(null); // Hata durumunda anahtarı null yap
+        } else if (data) {
+          setUserApiKey(data.api_key);
+        } else {
+          setUserApiKey(null); // Anahtar bulunamazsa null yap
+        }
+      };
+      fetchUserApiKey();
+    } else {
+      setUserApiKey(null); // Oturum yoksa anahtarı null yap
+    }
+  }, [session]);
 
   const handleAddWord = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,10 +111,17 @@ const AddWordForm: React.FC<AddWordFormProps> = ({ userId, onWordAdded }) => {
     let explanation = '';
     try {
       // OpenRouter API üzerinden çeviri ve açıklama alma
+      // Kullanılacak API anahtarını belirle: Kullanıcının anahtarı varsa onu, yoksa varsayılanı kullan
+      const apiKeyToUse = userApiKey || import.meta.env.VITE_OPENROUTER_API_KEY;
+
+      if (!apiKeyToUse) {
+        throw new Error('API anahtarı bulunamadı. Lütfen ayarlar sayfasından API anahtarınızı ekleyin veya varsayılan anahtarın tanımlı olduğundan emin olun.');
+      }
+
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`,
+          'Authorization': `Bearer ${apiKeyToUse}`, // Belirlenen API anahtarını kullan
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({

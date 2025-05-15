@@ -6,6 +6,7 @@ import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import UpdatePassword from './pages/UpdatePassword';
 import Dashboard from './pages/Dashboard';
+import Settings from './pages/Settings';
 import { ThemeProvider, createTheme } from '@mui/material/styles'; // ThemeProvider ve createTheme import et
 import CssBaseline from '@mui/material/CssBaseline'; // CssBaseline import et
 import { Box, Button } from '@mui/material'; // Box ve Button import et
@@ -79,6 +80,7 @@ function App() {
           <Route path="/update-password" element={<UpdatePassword />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/settings" element={<Settings />} />
         </Routes>
       </Box>
     </ThemeProvider>
