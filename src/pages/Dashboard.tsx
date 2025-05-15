@@ -121,9 +121,14 @@ const Dashboard: React.FC = () => {
         <Typography component="h1" variant="h5">
           Hoş Geldiniz, {user.email}!
         </Typography>
-        <Button variant="outlined" onClick={handleLogout} sx={{ mt: 2 }}>
-          Çıkış Yap
-        </Button>
+        <Box sx={{ mt: 2, display: 'flex', gap: 2 }}> {/* Butonları yan yana koymak için Box ekle */}
+          <Button variant="outlined" onClick={() => navigate('/settings')}> {/* Ayarlar sayfasına yönlendiren buton */}
+            Ayarlar
+          </Button>
+          <Button variant="outlined" onClick={handleLogout}>
+            Çıkış Yap
+          </Button>
+        </Box>
 
         <Typography component="h2" variant="h6" sx={{ mt: 4 }}>
           Kelimelerim
