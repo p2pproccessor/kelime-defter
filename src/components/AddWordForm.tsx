@@ -41,6 +41,7 @@ const AddWordForm: React.FC<AddWordFormProps> = ({ userId, onWordAdded }) => {
           .from('user_api_keys')
           .select('api_key')
           .eq('user_id', session.user.id)
+          .eq('is_active', true) // Aktif anahtarı çek
           .single();
 
         if (error && error.code !== 'PGRST116') { // PGRST116: Satır bulunamadı hatası

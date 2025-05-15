@@ -1,10 +1,19 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; // useNavigate import edildi
+import { Button, Box } from '@mui/material'; // Button ve Box import edildi
 import ApiKeyManager from '../components/ApiKeyManager';
 
 const Settings: React.FC = () => {
+  const navigate = useNavigate(); // useNavigate hook'u kullanıldı
+
   return (
-    <div>
-      <h1>Ayarlar</h1>
+    <div style={{ padding: '20px' }}> {/* İçerik için padding eklendi */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}> {/* Başlık ve buton için Box */}
+        <h1>Ayarlar</h1>
+        <Button variant="outlined" onClick={() => navigate('/dashboard')}> {/* Dashboard'a dön butonu */}
+          Dashboard'a Dön
+        </Button>
+      </Box>
       <p>Burada kullanıcı ayarları yer alacak.</p>
 
       {/* API Anahtarı Yönetimi Bölümü Buraya Gelecek */}
